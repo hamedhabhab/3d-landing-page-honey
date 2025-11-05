@@ -31,10 +31,167 @@
             width: 100%;
             height: 100%;
             cursor: grab;
+            perspective: 1000px;
+            position: relative;
         }
 
         #canvas-container:active {
             cursor: grabbing;
+        }
+
+        #honey-jar-3d {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform-style: preserve-3d;
+            transform: translateX(-50%) translateY(-50%);
+            width: 200px;
+            height: 350px;
+            transition: transform 0.1s ease-out;
+        }
+
+        .jar-part {
+            position: absolute;
+            transform-style: preserve-3d;
+        }
+
+        /* Main jar body */
+        #jar-body {
+            width: 180px;
+            height: 250px;
+            left: 10px;
+            top: 50px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.2) 0%, 
+                rgba(255, 255, 255, 0.05) 50%, 
+                rgba(200, 200, 255, 0.1) 100%);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            box-shadow: 
+                inset -10px 0 30px rgba(0, 0, 0, 0.1),
+                inset 10px 0 30px rgba(255, 255, 255, 0.2),
+                0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Honey liquid */
+        #honey-liquid {
+            position: absolute;
+            width: 160px;
+            height: 220px;
+            left: 10px;
+            top: 10px;
+            background: linear-gradient(180deg, 
+                #FFA500 0%, 
+                #FF8C00 50%, 
+                #FF7F00 100%);
+            border-radius: 8px;
+            box-shadow: 
+                inset -5px 0 20px rgba(0, 0, 0, 0.2),
+                inset 5px 0 20px rgba(255, 255, 255, 0.2);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% {
+                filter: brightness(1);
+            }
+            50% {
+                filter: brightness(1.1);
+            }
+        }
+
+        /* Jar lid */
+        #jar-lid {
+            width: 190px;
+            height: 40px;
+            left: 5px;
+            top: 15px;
+            background: linear-gradient(180deg, #FFD700 0%, #DAA520 50%, #B8860B 100%);
+            border: 3px solid #B8860B;
+            border-radius: 15px;
+            box-shadow: 
+                0 5px 15px rgba(0, 0, 0, 0.4),
+                inset 0 2px 10px rgba(255, 255, 255, 0.5);
+            transform: translateZ(30px);
+        }
+
+        /* Lid knob */
+        #lid-knob {
+            width: 40px;
+            height: 40px;
+            left: 80px;
+            top: -20px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #DAA520);
+            border: 2px solid #B8860B;
+            border-radius: 50%;
+            box-shadow: 
+                0 5px 10px rgba(0, 0, 0, 0.5),
+                inset -3px -3px 8px rgba(0, 0, 0, 0.3),
+                inset 3px 3px 8px rgba(255, 255, 255, 0.5);
+            transform: translateZ(40px);
+        }
+
+        /* Label */
+        #jar-label {
+            width: 140px;
+            height: 80px;
+            left: 30px;
+            top: 150px;
+            background: linear-gradient(135deg, #FFF8DC 0%, #FAEBD7 100%);
+            border: 2px solid #DEB887;
+            border-radius: 10px;
+            transform: translateZ(95px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Georgia', serif;
+        }
+
+        #jar-label .honey-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: #8B4513;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            margin: 0;
+        }
+
+        #jar-label .pure-text {
+            font-size: 14px;
+            color: #A0522D;
+            font-style: italic;
+            margin: 0;
+        }
+
+        /* 3D sides to give depth */
+        .jar-side {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #jar-left {
+            width: 100px;
+            height: 250px;
+            left: 10px;
+            top: 50px;
+            transform: rotateY(-90deg) translateZ(-90px);
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.15) 0%, 
+                rgba(255, 255, 255, 0.05) 100%);
+        }
+
+        #jar-right {
+            width: 100px;
+            height: 250px;
+            left: 190px;
+            top: 50px;
+            transform: rotateY(90deg) translateZ(0px);
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.05) 0%, 
+                rgba(255, 255, 255, 0.15) 100%);
         }
 
         #info-panel {
@@ -150,7 +307,21 @@
 </head>
 <body>
     <div id="container">
-        <div id="canvas-container"></div>
+        <div id="canvas-container">
+            <div id="honey-jar-3d">
+                <div class="jar-part jar-side" id="jar-left"></div>
+                <div class="jar-part jar-side" id="jar-right"></div>
+                <div class="jar-part" id="jar-body">
+                    <div id="honey-liquid"></div>
+                </div>
+                <div class="jar-part" id="jar-lid"></div>
+                <div class="jar-part" id="lid-knob"></div>
+                <div class="jar-part" id="jar-label">
+                    <p class="honey-text">HONEY</p>
+                    <p class="pure-text">Pure & Natural</p>
+                </div>
+            </div>
+        </div>
         
         <div id="info-panel">
             <h1>🍯 Interactive Honey Jar</h1>
@@ -174,50 +345,20 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let scene, camera, renderer, honeyJar, honeyMaterial;
+        let honeyJar;
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
         let interactionCount = 0;
         let hasInteracted = false;
+        let rotationX = 20;
+        let rotationY = 30;
+        let autoRotate = true;
+        let honeyColor = '#FFA500';
 
         function init() {
-            // Scene setup
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000000);
-            scene.background = null; // Make background transparent
-
-            // Camera setup
-            camera = new THREE.PerspectiveCamera(
-                75,
-                window.innerWidth / window.innerHeight,
-                0.1,
-                1000
-            );
-            camera.position.z = 5;
-
-            // Renderer setup
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = true;
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(5, 5, 5);
-            directionalLight.castShadow = true;
-            scene.add(directionalLight);
-
-            const pointLight = new THREE.PointLight(0xffa500, 0.5);
-            pointLight.position.set(-5, 3, 2);
-            scene.add(pointLight);
-
-            // Create honey jar
-            createHoneyJar();
+            // Get the honey jar container
+            honeyJar = document.getElementById('honey-jar-3d');
 
             // Event listeners
             setupEventListeners();
@@ -226,96 +367,18 @@
             animate();
         }
 
-        function createHoneyJar() {
-            // Create a group for the honey jar
-            honeyJar = new THREE.Group();
-
-            // Jar body (cylinder with glass material)
-            const jarGeometry = new THREE.CylinderGeometry(1, 1.2, 2.5, 32);
-            const jarMaterial = new THREE.MeshPhysicalMaterial({
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.3,
-                roughness: 0.1,
-                metalness: 0.1,
-                clearcoat: 1.0,
-                clearcoatRoughness: 0.1,
-            });
-            const jar = new THREE.Mesh(jarGeometry, jarMaterial);
-            jar.castShadow = true;
-            honeyJar.add(jar);
-
-            // Honey inside (smaller cylinder)
-            const honeyGeometry = new THREE.CylinderGeometry(0.9, 1.1, 2.2, 32);
-            honeyMaterial = new THREE.MeshStandardMaterial({
-                color: 0xFFA500,
-                transparent: true,
-                opacity: 0.85,
-                roughness: 0.3,
-                metalness: 0.2,
-            });
-            const honey = new THREE.Mesh(honeyGeometry, honeyMaterial);
-            honey.position.y = -0.1;
-            honeyJar.add(honey);
-
-            // Jar lid (cylinder)
-            const lidGeometry = new THREE.CylinderGeometry(1.1, 1.1, 0.3, 32);
-            const lidMaterial = new THREE.MeshStandardMaterial({
-                color: 0xD4AF37,
-                roughness: 0.4,
-                metalness: 0.8,
-            });
-            const lid = new THREE.Mesh(lidGeometry, lidMaterial);
-            lid.position.y = 1.4;
-            lid.castShadow = true;
-            honeyJar.add(lid);
-
-            // Lid knob (sphere)
-            const knobGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-            const knob = new THREE.Mesh(knobGeometry, lidMaterial);
-            knob.position.y = 1.7;
-            honeyJar.add(knob);
-
-            // Add label (plane)
-            const labelGeometry = new THREE.PlaneGeometry(1.5, 0.8);
-            const labelMaterial = new THREE.MeshBasicMaterial({
-                color: 0xFFF8DC,
-                side: THREE.DoubleSide,
-            });
-            const label = new THREE.Mesh(labelGeometry, labelMaterial);
-            label.position.z = 1.01;
-            label.position.y = 0;
-            honeyJar.add(label);
-
-            // Add text to label (using a simple shape)
-            const textGeometry = new THREE.PlaneGeometry(1.2, 0.3);
-            const textMaterial = new THREE.MeshBasicMaterial({
-                color: 0x8B4513,
-                side: THREE.DoubleSide,
-            });
-            const text = new THREE.Mesh(textGeometry, textMaterial);
-            text.position.z = 1.02;
-            text.position.y = 0.1;
-            honeyJar.add(text);
-
-            scene.add(honeyJar);
-
-            // Initial rotation for better view
-            honeyJar.rotation.y = 0.5;
-        }
-
         function setupEventListeners() {
-            const canvas = renderer.domElement;
+            const container = document.getElementById('canvas-container');
 
-            canvas.addEventListener('mousedown', onMouseDown);
-            canvas.addEventListener('mousemove', onMouseMove);
-            canvas.addEventListener('mouseup', onMouseUp);
-            canvas.addEventListener('mouseleave', onMouseUp);
+            container.addEventListener('mousedown', onMouseDown);
+            container.addEventListener('mousemove', onMouseMove);
+            container.addEventListener('mouseup', onMouseUp);
+            container.addEventListener('mouseleave', onMouseUp);
 
             // Touch events for mobile
-            canvas.addEventListener('touchstart', onTouchStart);
-            canvas.addEventListener('touchmove', onTouchMove);
-            canvas.addEventListener('touchend', onTouchEnd);
+            container.addEventListener('touchstart', onTouchStart);
+            container.addEventListener('touchmove', onTouchMove);
+            container.addEventListener('touchend', onTouchEnd);
 
             // Color picker
             document.getElementById('color-picker').addEventListener('input', onColorChange);
@@ -326,6 +389,7 @@
 
         function onMouseDown(event) {
             isDragging = true;
+            autoRotate = false;
             previousMousePosition = {
                 x: event.clientX,
                 y: event.clientY
@@ -337,8 +401,11 @@
                 const deltaX = event.clientX - previousMousePosition.x;
                 const deltaY = event.clientY - previousMousePosition.y;
 
-                honeyJar.rotation.y += deltaX * 0.01;
-                honeyJar.rotation.x += deltaY * 0.01;
+                rotationY += deltaX * 0.5;
+                rotationX -= deltaY * 0.5;
+
+                // Clamp X rotation
+                rotationX = Math.max(-90, Math.min(90, rotationX));
 
                 previousMousePosition = {
                     x: event.clientX,
@@ -346,6 +413,7 @@
                 };
 
                 registerInteraction();
+                updateJarTransform();
             }
         }
 
@@ -355,7 +423,9 @@
 
         function onTouchStart(event) {
             if (event.touches.length === 1) {
+                event.preventDefault();
                 isDragging = true;
+                autoRotate = false;
                 previousMousePosition = {
                     x: event.touches[0].clientX,
                     y: event.touches[0].clientY
@@ -365,11 +435,15 @@
 
         function onTouchMove(event) {
             if (isDragging && event.touches.length === 1) {
+                event.preventDefault();
                 const deltaX = event.touches[0].clientX - previousMousePosition.x;
                 const deltaY = event.touches[0].clientY - previousMousePosition.y;
 
-                honeyJar.rotation.y += deltaX * 0.01;
-                honeyJar.rotation.x += deltaY * 0.01;
+                rotationY += deltaX * 0.5;
+                rotationX -= deltaY * 0.5;
+
+                // Clamp X rotation
+                rotationX = Math.max(-90, Math.min(90, rotationX));
 
                 previousMousePosition = {
                     x: event.touches[0].clientX,
@@ -377,6 +451,7 @@
                 };
 
                 registerInteraction();
+                updateJarTransform();
             }
         }
 
@@ -403,26 +478,54 @@
         }
 
         function onColorChange(event) {
-            const color = event.target.value;
-            honeyMaterial.color.set(color);
+            honeyColor = event.target.value;
+            const honeyLiquid = document.getElementById('honey-liquid');
+            // Create a gradient with the selected color
+            honeyLiquid.style.background = `linear-gradient(180deg, 
+                ${honeyColor} 0%, 
+                ${adjustBrightness(honeyColor, -20)} 50%, 
+                ${adjustBrightness(honeyColor, -40)} 100%)`;
+        }
+
+        // Helper function to adjust color brightness
+        function adjustBrightness(color, percent) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255))
+                .toString(16).slice(1);
         }
 
         function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            // Handle responsive design if needed
+        }
+
+        function updateJarTransform() {
+            honeyJar.style.transform = `
+                perspective(1000px)
+                rotateX(${rotationX}deg)
+                rotateY(${rotationY}deg)
+                translateZ(0)
+            `;
         }
 
         function animate() {
             requestAnimationFrame(animate);
 
-            // Gentle floating animation when not dragging
-            if (!isDragging) {
-                honeyJar.position.y = Math.sin(Date.now() * 0.001) * 0.1;
-                honeyJar.rotation.y += 0.002;
+            // Gentle auto-rotation when not dragging
+            if (!isDragging && autoRotate) {
+                rotationY += 0.3;
             }
 
-            renderer.render(scene, camera);
+            // Floating animation
+            const floatY = Math.sin(Date.now() * 0.001) * 10;
+            honeyJar.style.top = `calc(50% + ${floatY}px)`;
+
+            updateJarTransform();
         }
 
         // Initialize the scene when the page loads
