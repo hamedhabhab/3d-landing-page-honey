@@ -505,12 +505,7 @@
         }
 
         function updateJarTransform() {
-            honeyJar.style.transform = `
-                perspective(1000px)
-                rotateX(${rotationX}deg)
-                rotateY(${rotationY}deg)
-                translateZ(0)
-            `;
+            honeyJar.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg) translateZ(0)`;
         }
 
         function animate() {

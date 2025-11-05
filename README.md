@@ -5,9 +5,9 @@ A fully interactive single-page web application featuring a beautiful 3D honey j
 ## Features
 
 ### Core Feature: Interactive 3D Honey Jar 🍯
-- Fully interactive 3D model built with Three.js
+- Fully interactive 3D model built with CSS 3D transforms
 - Drag to rotate the honey jar in any direction
-- Smooth animations and realistic lighting
+- Smooth animations with beautiful gradients and shadows
 - Touch-enabled for mobile devices
 - Gentle floating animation when idle
 
@@ -36,8 +36,8 @@ Once you interact with the honey jar, two additional features become available:
 ## Technical Details
 
 - **No build process required** - Just open the HTML file!
-- Uses Three.js for 3D rendering
-- Pure vanilla JavaScript - no frameworks
+- Uses CSS 3D transforms for hardware-accelerated 3D rendering
+- Pure vanilla JavaScript - no frameworks or external libraries
 - Fully responsive design
 - Mobile-friendly with touch support
 
