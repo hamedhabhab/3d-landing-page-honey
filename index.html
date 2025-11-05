@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Honey Jar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+            perspective: 1000px;
+            position: relative;
+        }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        #honey-jar-3d {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform-style: preserve-3d;
+            transform: translateX(-50%) translateY(-50%);
+            width: 200px;
+            height: 350px;
+            transition: transform 0.1s ease-out;
+        }
+
+        .jar-part {
+            position: absolute;
+            transform-style: preserve-3d;
+        }
+
+        /* Main jar body */
+        #jar-body {
+            width: 180px;
+            height: 250px;
+            left: 10px;
+            top: 50px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.2) 0%, 
+                rgba(255, 255, 255, 0.05) 50%, 
+                rgba(200, 200, 255, 0.1) 100%);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            box-shadow: 
+                inset -10px 0 30px rgba(0, 0, 0, 0.1),
+                inset 10px 0 30px rgba(255, 255, 255, 0.2),
+                0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Honey liquid */
+        #honey-liquid {
+            position: absolute;
+            width: 160px;
+            height: 220px;
+            left: 10px;
+            top: 10px;
+            background: linear-gradient(180deg, 
+                #FFA500 0%, 
+                #FF8C00 50%, 
+                #FF7F00 100%);
+            border-radius: 8px;
+            box-shadow: 
+                inset -5px 0 20px rgba(0, 0, 0, 0.2),
+                inset 5px 0 20px rgba(255, 255, 255, 0.2);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% {
+                filter: brightness(1);
+            }
+            50% {
+                filter: brightness(1.1);
+            }
+        }
+
+        /* Jar lid */
+        #jar-lid {
+            width: 190px;
+            height: 40px;
+            left: 5px;
+            top: 15px;
+            background: linear-gradient(180deg, #FFD700 0%, #DAA520 50%, #B8860B 100%);
+            border: 3px solid #B8860B;
+            border-radius: 15px;
+            box-shadow: 
+                0 5px 15px rgba(0, 0, 0, 0.4),
+                inset 0 2px 10px rgba(255, 255, 255, 0.5);
+            transform: translateZ(30px);
+        }
+
+        /* Lid knob */
+        #lid-knob {
+            width: 40px;
+            height: 40px;
+            left: 80px;
+            top: -20px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #DAA520);
+            border: 2px solid #B8860B;
+            border-radius: 50%;
+            box-shadow: 
+                0 5px 10px rgba(0, 0, 0, 0.5),
+                inset -3px -3px 8px rgba(0, 0, 0, 0.3),
+                inset 3px 3px 8px rgba(255, 255, 255, 0.5);
+            transform: translateZ(40px);
+        }
+
+        /* Label */
+        #jar-label {
+            width: 140px;
+            height: 80px;
+            left: 30px;
+            top: 150px;
+            background: linear-gradient(135deg, #FFF8DC 0%, #FAEBD7 100%);
+            border: 2px solid #DEB887;
+            border-radius: 10px;
+            transform: translateZ(95px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Georgia', serif;
+        }
+
+        #jar-label .honey-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: #8B4513;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            margin: 0;
+        }
+
+        #jar-label .pure-text {
+            font-size: 14px;
+            color: #A0522D;
+            font-style: italic;
+            margin: 0;
+        }
+
+        /* 3D sides to give depth */
+        .jar-side {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #jar-left {
+            width: 100px;
+            height: 250px;
+            left: 10px;
+            top: 50px;
+            transform: rotateY(-90deg) translateZ(-90px);
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.15) 0%, 
+                rgba(255, 255, 255, 0.05) 100%);
+        }
+
+        #jar-right {
+            width: 100px;
+            height: 250px;
+            left: 190px;
+            top: 50px;
+            transform: rotateY(90deg) translateZ(0px);
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.05) 0%, 
+                rgba(255, 255, 255, 0.15) 100%);
+        }
+
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 320px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .instruction {
+            font-size: 14px;
+            font-style: italic;
+            color: #888;
+            margin-top: 10px;
+        }
+
+        #features-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 320px;
+            backdrop-filter: blur(10px);
+            opacity: 0.3;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        #features-panel.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .feature {
+            margin-bottom: 20px;
+        }
+
+        .feature h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        #interaction-count {
+            font-size: 36px;
+            font-weight: bold;
+            color: #764ba2;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        #color-picker-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #color-picker {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #color-label {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .locked-message {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            #info-panel, #features-panel {
+                max-width: 90%;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            #features-panel {
+                top: auto;
+                bottom: 20px;
+                right: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="canvas-container">
+            <div id="honey-jar-3d">
+                <div class="jar-part jar-side" id="jar-left"></div>
+                <div class="jar-part jar-side" id="jar-right"></div>
+                <div class="jar-part" id="jar-body">
+                    <div id="honey-liquid"></div>
+                </div>
+                <div class="jar-part" id="jar-lid"></div>
+                <div class="jar-part" id="lid-knob"></div>
+                <div class="jar-part" id="jar-label">
+                    <p class="honey-text">HONEY</p>
+                    <p class="pure-text">Pure & Natural</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="info-panel">
+            <h1>🍯 Interactive Honey Jar</h1>
+            <p>Welcome! Drag to rotate the honey jar and explore its 3D beauty.</p>
+            <p class="instruction">Interact with the jar to unlock special features!</p>
+        </div>
+
+        <div id="features-panel">
+            <div class="feature">
+                <h3>📊 Interaction Counter</h3>
+                <div id="interaction-count">0</div>
+                <p style="text-align: center; font-size: 12px;">Total interactions</p>
+            </div>
+            <div class="feature">
+                <h3>🎨 Honey Color Picker</h3>
+                <div id="color-picker-container">
+                    <input type="color" id="color-picker" value="#FFA500">
+                    <div id="color-label">Choose your honey color</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let honeyJar;
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let interactionCount = 0;
+        let hasInteracted = false;
+        let rotationX = 20;
+        let rotationY = 30;
+        let autoRotate = true;
+        let honeyColor = '#FFA500';
+
+        function init() {
+            // Get the honey jar container
+            honeyJar = document.getElementById('honey-jar-3d');
+
+            // Event listeners
+            setupEventListeners();
+
+            // Animation loop
+            animate();
+        }
+
+        function setupEventListeners() {
+            const container = document.getElementById('canvas-container');
+
+            container.addEventListener('mousedown', onMouseDown);
+            container.addEventListener('mousemove', onMouseMove);
+            container.addEventListener('mouseup', onMouseUp);
+            container.addEventListener('mouseleave', onMouseUp);
+
+            // Touch events for mobile
+            container.addEventListener('touchstart', onTouchStart);
+            container.addEventListener('touchmove', onTouchMove);
+            container.addEventListener('touchend', onTouchEnd);
+
+            // Color picker
+            document.getElementById('color-picker').addEventListener('input', onColorChange);
+
+            // Window resize
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function onMouseDown(event) {
+            isDragging = true;
+            autoRotate = false;
+            previousMousePosition = {
+                x: event.clientX,
+                y: event.clientY
+            };
+        }
+
+        function onMouseMove(event) {
+            if (isDragging) {
+                const deltaX = event.clientX - previousMousePosition.x;
+                const deltaY = event.clientY - previousMousePosition.y;
+
+                rotationY += deltaX * 0.5;
+                rotationX -= deltaY * 0.5;
+
+                // Clamp X rotation
+                rotationX = Math.max(-90, Math.min(90, rotationX));
+
+                previousMousePosition = {
+                    x: event.clientX,
+                    y: event.clientY
+                };
+
+                registerInteraction();
+                updateJarTransform();
+            }
+        }
+
+        function onMouseUp() {
+            isDragging = false;
+        }
+
+        function onTouchStart(event) {
+            if (event.touches.length === 1) {
+                event.preventDefault();
+                isDragging = true;
+                autoRotate = false;
+                previousMousePosition = {
+                    x: event.touches[0].clientX,
+                    y: event.touches[0].clientY
+                };
+            }
+        }
+
+        function onTouchMove(event) {
+            if (isDragging && event.touches.length === 1) {
+                event.preventDefault();
+                const deltaX = event.touches[0].clientX - previousMousePosition.x;
+                const deltaY = event.touches[0].clientY - previousMousePosition.y;
+
+                rotationY += deltaX * 0.5;
+                rotationX -= deltaY * 0.5;
+
+                // Clamp X rotation
+                rotationX = Math.max(-90, Math.min(90, rotationX));
+
+                previousMousePosition = {
+                    x: event.touches[0].clientX,
+                    y: event.touches[0].clientY
+                };
+
+                registerInteraction();
+                updateJarTransform();
+            }
+        }
+
+        function onTouchEnd() {
+            isDragging = false;
+        }
+
+        function registerInteraction() {
+            if (!hasInteracted) {
+                hasInteracted = true;
+                unlockFeatures();
+            }
+            interactionCount++;
+            updateInteractionCounter();
+        }
+
+        function unlockFeatures() {
+            const featuresPanel = document.getElementById('features-panel');
+            featuresPanel.classList.add('active');
+        }
+
+        function updateInteractionCounter() {
+            document.getElementById('interaction-count').textContent = interactionCount;
+        }
+
+        function onColorChange(event) {
+            honeyColor = event.target.value;
+            const honeyLiquid = document.getElementById('honey-liquid');
+            // Create a gradient with the selected color
+            honeyLiquid.style.background = `linear-gradient(180deg, 
+                ${honeyColor} 0%, 
+                ${adjustBrightness(honeyColor, -20)} 50%, 
+                ${adjustBrightness(honeyColor, -40)} 100%)`;
+        }
+
+        // Helper function to adjust color brightness
+        function adjustBrightness(color, percent) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255))
+                .toString(16).slice(1);
+        }
+
+        function onWindowResize() {
+            // Handle responsive design if needed
+        }
+
+        function updateJarTransform() {
+            honeyJar.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg) translateZ(0)`;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Gentle auto-rotation when not dragging
+            if (!isDragging && autoRotate) {
+                rotationY += 0.3;
+            }
+
+            // Floating animation
+            const floatY = Math.sin(Date.now() * 0.001) * 10;
+            honeyJar.style.top = `calc(50% + ${floatY}px)`;
+
+            updateJarTransform();
+        }
+
+        // Initialize the scene when the page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
